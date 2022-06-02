@@ -1,0 +1,11 @@
+---
+- hosts: backend
+  become: yes
+  roles:
+  - netdata 
+  
+- hosts: frontend
+  become: yes
+  roles:
+  - nginx
+ 

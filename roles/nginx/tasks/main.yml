@@ -1,0 +1,67 @@
+---
+# tasks file for nginx
+
+- name: set the hostname on server
+  hostname:
+    name: c8.local
+
+- name: Retrieve all the repos inside repos.d directory
+  find:
+    paths: "/etc/yum.repos.d/"
+    patterns: "*.repo"
+  register: repos
+
+- name: Disabling mirrolist entries in all repos file
+  replace:
+    path: "{{ item.path }}"
+    regexp: 'mirrorlist'
+    replace: '#mirrorlist'
+  with_items: "{{ repos.files }}"
+
+- name: changing the baseurl to a working one in all repos
+  replace:
+    path: "{{ item.path }}"
+    regexp: '#baseurl=http://mirror.centos.org'
+    replace: 'baseurl=http://vault.centos.org'
+  with_items: "{{ repos.files }}"
+
+- name: Disable SELinux on server
+  selinux:
+    state: disabled
+
+- name:  reboot the centos server
+  reboot:
+
+- name: wait for server to be reachable after reboot 
+  wait_for_connection:
+
+- name: Install nginx on centos server
+  dnf:
+    name: nginx
+    state: latest
+
+- name: enable and restart nginx service
+  systemd:
+    state: started
+    name: nginx
+    enabled: yes
+
+- name: modify /etc/nginx/nginx.conf with proxy configuration
+  template:
+    src: ngnix.conf.j2
+    dest: /etc/nginx/nginx.conf
+
+- name: checking the nginx configutaion file
+  shell: nginx -t
+  register: nginxstat
+
+- name:  restart nginx service after modify nginx.conf with proxy configuration
+  systemd:
+    state: restarted
+    name: nginx
+  register: nginxstatus
+
+- name: Display Netdata Dashboard Details 
+  debug:
+    msg: "netdata dashboard is available at http://{{ inventory_hostname }}:80"
+  failed_when: nginxstatus.state != "started"

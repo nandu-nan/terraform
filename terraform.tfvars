@@ -1,0 +1,5 @@
+reg = "us-east-2"
+vpcid = "vpc-a45086cf"
+ec2type = "t3.micro"
+privsshkey = "/root/.ssh/id_rsa"
+pubkey = "/root/.ssh/id_rsa.pub"

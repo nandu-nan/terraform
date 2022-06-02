@@ -1,0 +1,23 @@
+---
+# tasks file for netdata
+
+- name: set the hostname on server
+  hostname:
+    name: u21.local
+
+- name: Install netdata package and update repositories
+  apt:
+    name: netdata
+    update_cache: yes
+
+- name: change the localhost with ip address in netdata.conf 
+  replace:
+    path: /etc/netdata/netdata.conf
+    regexp: 'bind(\s+)(.*)$'
+    replace: 'bind socket to IP = {{ansible_default_ipv4.address}}'
+
+- name: enable and restart netdata service
+  systemd:
+    state: restarted
+    name: netdata
+    enabled: yes
