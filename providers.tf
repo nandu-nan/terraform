@@ -4,11 +4,6 @@ terraform {
       source = "hashicorp/aws"
       version = "~> 3.0"
      }
-   backend "s3" {
-    bucket = "nginxnetdata"
-    key    = "nginx/nginx.tfstate"
-    region = "us-east-2"
-    profile = "dev"
   }
 }
 
