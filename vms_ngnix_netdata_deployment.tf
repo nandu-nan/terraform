@@ -1,12 +1,3 @@
-terraform {
-  backend "s3" {
-    bucket = "nginxnetdata"
-    key    = "nginx/nginx.tfstate"
-    region = "us-east-2"
-    profile = "dev"
-   }
-}
-
 data "aws_ami" "ubuntu" {
   most_recent = true
   provider = aws.dev
